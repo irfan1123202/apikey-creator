@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="aws-gold">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS ProfileVault API - Cloud User Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ========== THEME DEFINITIONS ========== */
+    :root, [data-theme="aws-gold"] {
+      --bg: #090d16;
+      --bg-card: rgba(16, 23, 38, 0.78);
+      --bg-card-hover: rgba(22, 32, 53, 0.9);
+      --border: rgba(255, 153, 0, 0.2);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --primary: #ff9900;
+      --primary-hover: #ffaa22;
+      --primary-glow: rgba(255, 153, 0, 0.35);
+      --accent: #00d2ff;
+      --accent-glow: rgba(0, 210, 255, 0.25);
+      --success: #10b981;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --badge-bg: rgba(255, 153, 0, 0.12);
+      --badge-text: #ffb84d;
+      --gradient-brand: linear-gradient(135deg, #ff9900 0%, #ff5500 100%);
+      --gradient-bg: radial-gradient(at 0% 0%, rgba(255, 153, 0, 0.12) 0px, transparent 50%),
+                     radial-gradient(at 100% 0%, rgba(0, 210, 255, 0.1) 0px, transparent 50%),
+                     radial-gradient(at 50% 100%, rgba(255, 85, 0, 0.08) 0px, transparent 50%);
+    }
+
+    [data-theme="cyber-cloud"] {
+      --bg: #060b14;
+      --bg-card: rgba(13, 22, 39, 0.82);
+      --bg-card-hover: rgba(18, 30, 54, 0.92);
+      --border: rgba(0, 242, 254, 0.25);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --primary: #00f2fe;
+      --primary-hover: #38f9d7;
+      --primary-glow: rgba(0, 242, 254, 0.4);
+      --accent: #4facfe;
+      --accent-glow: rgba(79, 172, 254, 0.3);
+      --success: #05df72;
+      --danger: #ff4757;
+      --text: #f0fdfa;
+      --text-muted: #8096b1;
+      --badge-bg: rgba(0, 242, 254, 0.12);
+      --badge-text: #5eead4;
+      --gradient-brand: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+      --gradient-bg: radial-gradient(at 0% 0%, rgba(0, 242, 254, 0.15) 0px, transparent 50%),
+                     radial-gradient(at 100% 0%, rgba(79, 172, 254, 0.12) 0px, transparent 50%),
+                     radial-gradient(at 50% 100%, rgba(0, 168, 255, 0.08) 0px, transparent 50%);
+    }
+
+    [data-theme="neo-violet"] {
+      --bg: #0c0919;
+      --bg-card: rgba(23, 17, 43, 0.82);
+      --bg-card-hover: rgba(33, 24, 62, 0.92);
+      --border: rgba(168, 85, 247, 0.28);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --primary: #a855f7;
+      --primary-hover: #c084fc;
+      --primary-glow: rgba(168, 85, 247, 0.4);
+      --accent: #ec4899;
+      --accent-glow: rgba(236, 72, 153, 0.3);
+      --success: #10b981;
+      --danger: #f43f5e;
+      --text: #faf5ff;
+      --text-muted: #a89bc2;
+      --badge-bg: rgba(168, 85, 247, 0.15);
+      --badge-text: #d8b4fe;
+      --gradient-brand: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+      --gradient-bg: radial-gradient(at 0% 0%, rgba(168, 85, 247, 0.16) 0px, transparent 50%),
+                     radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.12) 0px, transparent 50%),
+                     radial-gradient(at 50% 100%, rgba(139, 92, 246, 0.08) 0px, transparent 50%);
+    }
+
+    [data-theme="emerald-matrix"] {
+      --bg: #07120c;
+      --bg-card: rgba(12, 31, 22, 0.82);
+      --bg-card-hover: rgba(16, 43, 30, 0.92);
+      --border: rgba(16, 185, 129, 0.25);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --primary: #10b981;
+      --primary-hover: #34d399;
+      --primary-glow: rgba(16, 185, 129, 0.4);
+      --accent: #06b6d4;
+      --accent-glow: rgba(6, 182, 212, 0.3);
+      --success: #10b981;
+      --danger: #f87171;
+      --text: #f0fdf4;
+      --text-muted: #86a894;
+      --badge-bg: rgba(16, 185, 129, 0.15);
+      --badge-text: #6ee7b7;
+      --gradient-brand: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+      --gradient-bg: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.16) 0px, transparent 50%),
+                     radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.12) 0px, transparent 50%),
+                     radial-gradient(at 50% 100%, rgba(5, 150, 105, 0.08) 0px, transparent 50%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: var(--gradient-bg);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ========== NAVBAR ========== */
+    header {
+      border-bottom: 1px solid var(--border-subtle);
+      backdrop-filter: blur(16px);
+      background: rgba(9, 13, 22, 0.85);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--gradient-brand);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px var(--primary-glow);
+      flex-shrink: 0;
+    }
+
+    .brand-icon svg {
+      width: 24px;
+      height: 24px;
+      fill: #ffffff;
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 30%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-subtitle {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    .theme-select {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.45rem 0.8rem;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .theme-select option {
+      background: #111827;
+      color: white;
+    }
+
+    /* ========== BUTTONS ========== */
+    .btn {
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.55rem 1.15rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--gradient-brand);
+      color: #0b0f19;
+      font-weight: 700;
+      box-shadow: 0 4px 16px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px var(--primary-glow);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--border);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    /* ========== MAIN LAYOUT ========== */
+    main {
+      max-width: 1280px;
+      margin: 1.75rem auto 3rem;
+      padding: 0 1.5rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1.25rem 1.4rem;
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border);
+    }
+
+    .stat-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    /* Quick Manual Entry Card */
+    .quick-entry-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.75rem;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .quick-entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .quick-entry-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .quick-entry-title span.badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .quick-form {
+      display: grid;
+      grid-template-columns: 2fr 2.5fr 1fr auto;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    @media (max-width: 860px) {
+      .quick-form {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-field {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.65rem 0.9rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    .tab-btn.active {
+      color: var(--text);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px 3px 0 0;
+      box-shadow: 0 0 12px var(--primary);
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 1.5rem;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 380px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.65rem 1rem 0.65rem 2.4rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      fill: var(--text-muted);
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    /* Table */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      padding: 0.9rem 1.1rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid var(--border-subtle);
+      font-weight: 700;
+    }
+
+    td {
+      padding: 0.95rem 1.1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.9rem;
+    }
+
+    tr:hover td {
+      background: var(--bg-card-hover);
+    }
+
+    .user-profile-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--gradient-brand);
+      color: #0b0f19;
+      font-weight: 800;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+
+    .badge-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      padding: 0.2rem 0.5rem;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+
+    .user-name {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .user-email {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .badge-age {
+      font-weight: 700;
+      font-size: 0.8rem;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+    }
+
+    .actions-cell {
+      display: flex;
+      gap: 0.45rem;
+    }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .icon-btn.delete:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border-color: var(--danger);
+    }
+
+    /* API Explorer */
+    .endpoint-card {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      margin-bottom: 0.9rem;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .endpoint-card:hover {
+      border-color: var(--border);
+    }
+
+    .endpoint-header {
+      padding: 0.95rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .method-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+    }
+
+    .method-get { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .method-post { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.35); }
+    .method-put { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .method-delete { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+
+    .endpoint-path {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .endpoint-desc {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      margin-left: auto;
+    }
+
+    .json-viewer {
+      background: #050811;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #93c5fd;
+      max-height: 280px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      padding: 1.75rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+      transform: scale(0.95);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.open .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      color: var(--text);
+    }
+
+    .form-group {
+      margin-bottom: 1.15rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-hint {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      z-index: 120;
+    }
+
+    .toast {
+      background: #111827;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      animation: slideIn 0.25s ease;
+    }
+
+    .toast.success { border-color: rgba(16, 185, 129, 0.6); }
+    .toast.error { border-color: rgba(239, 68, 68, 0.6); }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header>
+    <div class="nav-container">
+      <a href="/" class="brand">
+        <div class="brand-icon">
+          <!-- AWS Cloud Profile Icon -->
+          <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            AWS ProfileVault API
+          </div>
+          <div class="brand-subtitle">Cloud Identity & REST Architecture</div>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <!-- Live Status Pill -->
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          <span>AWS ProfileVault Live</span>
+        </div>
+
+        <!-- Theme Selector -->
+        <label for="themeSelect" style="display:none;">Select Theme</label>
+        <select id="themeSelect" class="theme-select" title="Change Theme">
+          <option value="aws-gold">Theme: AWS Obsidian Gold</option>
+          <option value="cyber-cloud">Theme: Cyber Cloud Cyan</option>
+          <option value="neo-violet">Theme: Neo Violet Nebula</option>
+          <option value="emerald-matrix">Theme: Emerald Matrix</option>
+        </select>
+
+        <button class="btn btn-secondary btn-sm" id="openBulkModalBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Import JSON
+        </button>
+
+        <button class="btn btn-primary btn-sm" id="openAddModalBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          New Profile
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Top Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Active Profiles</div>
+        <div class="stat-value" id="statTotalUsers">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Average Age</div>
+        <div class="stat-value" id="statAvgAge">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">API Response Time</div>
+        <div class="stat-value" id="statLatency" style="font-size: 1.6rem; color: #34d399;">~4 ms</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Validation Engine</div>
+        <div class="stat-value" style="font-size: 1.3rem; color: var(--primary);">RFC 5322 Compliant</div>
+      </div>
+    </div>
+
+    <!-- Quick Manual Entry Card -->
+    <section class="quick-entry-card">
+      <div class="quick-entry-header">
+        <div class="quick-entry-title">
+          <span>Manual Profile Quick-Entry</span>
+          <span class="badge">Direct DB Insert</span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+          Enter user details manually to store immediately in the ProfileVault backend.
+        </div>
+      </div>
+      <form id="quickUserForm" class="quick-form">
+        <div class="input-wrapper">
+          <input type="text" id="quickName" class="input-field" placeholder="Full Name (e.g. Rahul Sharma)" required minlength="2" maxlength="50" />
+        </div>
+        <div class="input-wrapper">
+          <input type="email" id="quickEmail" class="input-field" placeholder="Email Address (e.g. rahul@example.com)" required />
+        </div>
+        <div class="input-wrapper">
+          <input type="number" id="quickAge" class="input-field" placeholder="Age (1-120)" min="1" max="120" required />
+        </div>
+        <button type="submit" class="btn btn-primary" id="quickSubmitBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          Add Profile
+        </button>
+      </form>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="users-tab">Profile Vault</button>
+      <button class="tab-btn" data-tab="explorer-tab">AWS API Console & Explorer</button>
+      <button class="tab-btn" data-tab="raw-tab">Raw JSON Schema</button>
+    </div>
+
+    <!-- Tab 1: Profile Vault -->
+    <section id="users-tab" class="tab-content card">
+      <div class="toolbar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" id="searchInput" placeholder="Search profiles by name (e.g. Asha)..." />
+        </div>
+
+        <div class="toolbar-actions">
+          <button class="btn btn-secondary btn-sm" id="exportJsonBtn" title="Export profiles to JSON">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
+            Export JSON
+          </button>
+          <button class="btn btn-secondary btn-sm" id="refreshBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+            Refresh
+          </button>
+          <button class="btn btn-danger btn-sm" id="clearAllBtn" title="Wipe all users for manual re-entry">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            Clear All
+          </button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 80px;">UID</th>
+              <th>Profile Name</th>
+              <th>Verified Email</th>
+              <th style="width: 100px;">Age</th>
+              <th style="width: 140px; text-align: right;">Manage</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">Loading ProfileVault data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Tab 2: AWS API Console & Explorer -->
+    <section id="explorer-tab" class="tab-content card" style="display: none;">
+      <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; margin-bottom: 0.4rem;">AWS ProfileVault API Console</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Trigger live HTTP requests against the backend server:</p>
+
+      <!-- GET /users -->
+      <div class="endpoint-card">
+        <div class="endpoint-header" onclick="testEndpoint('GET', '/users')">
+          <span class="method-badge method-get">GET</span>
+          <span class="endpoint-path">/users</span>
+          <span class="endpoint-desc">Fetch all profiles (supports query filter: ?name=)</span>
+          <button class="btn btn-secondary btn-sm">Execute GET</button>
+        </div>
+      </div>
+
+      <!-- GET /users/:id -->
+      <div class="endpoint-card">
+        <div class="endpoint-header" onclick="testEndpoint('GET', '/users/1')">
+          <span class="method-badge method-get">GET</span>
+          <span class="endpoint-path">/users/:id</span>
+          <span class="endpoint-desc">Retrieve single profile by ID</span>
+          <button class="btn btn-secondary btn-sm">Execute (ID: 1)</button>
+        </div>
+      </div>
+
+      <!-- POST /users -->
+      <div class="endpoint-card">
+        <div class="endpoint-header" onclick="testEndpoint('POST', '/users', { name: 'Priya Nair', email: 'priya_' + Date.now().toString().slice(-4) + '@example.com', age: 23 })">
+          <span class="method-badge method-post">POST</span>
+          <span class="endpoint-path">/users</span>
+          <span class="endpoint-desc">Store new identity profile</span>
+          <button class="btn btn-secondary btn-sm">Execute POST</button>
+        </div>
+      </div>
+
+      <!-- Live Response Viewer -->
+      <div style="margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">API Response Payload</span>
+          <span id="responseStatus" class="method-badge method-get" style="display: none;">200 OK</span>
+        </div>
+        <div class="json-viewer" id="explorerResponse">// Click any "Execute" button above to inspect live output...</div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Raw Schema -->
+    <section id="raw-tab" class="tab-content card" style="display: none;">
+      <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; margin-bottom: 0.4rem;">Root Route Metadata</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">JSON returned when calling <code>GET /</code> with application/json:</p>
+      <div class="json-viewer" id="rawApiResponse">Loading...</div>
+    </section>
+  </main>
+
+  <!-- Add / Edit Modal -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal-card">
+      <h3 class="modal-title" id="modalTitle">Create New Profile</h3>
+      <form id="userForm">
+        <input type="hidden" id="userId" />
+        <div class="form-group">
+          <label for="userName">Full Name</label>
+          <input type="text" id="userName" class="input-field" required minlength="2" maxlength="50" placeholder="e.g. Priya Nair" />
+          <div class="form-hint">Rule: 2 to 50 characters</div>
+        </div>
+        <div class="form-group">
+          <label for="userEmail">Email Address</label>
+          <input type="email" id="userEmail" class="input-field" required placeholder="e.g. priya@example.com" />
+          <div class="form-hint">Rule: Must be valid RFC format and unique</div>
+        </div>
+        <div class="form-group">
+          <label for="userAge">Age</label>
+          <input type="number" id="userAge" class="input-field" required min="1" max="120" placeholder="e.g. 24" />
+          <div class="form-hint">Rule: Whole integer between 1 and 120</div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="closeModalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveUserBtn">Save to Vault</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bulk Import Modal -->
+  <div class="modal-overlay" id="bulkModal">
+    <div class="modal-card" style="max-width: 540px;">
+      <h3 class="modal-title">Bulk Import Profiles</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Paste a JSON array of users to insert them all into the ProfileVault backend:
+      </p>
+      <div class="form-group">
+        <label for="bulkJson">JSON Array Format</label>
+        <textarea id="bulkJson" class="input-field" rows="8" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;" placeholder='[
+  { "name": "Aman Verma", "email": "aman@example.com", "age": 25 },
+  { "name": "Sneha Roy", "email": "sneha@example.com", "age": 27 }
+]'></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="closeBulkBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="submitBulkBtn">Import Profiles</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    const isGitHub = window.location.hostname.includes("github.io");
+    const isLocalFile = window.location.protocol === "file:";
+    let useLocalEngine = isGitHub || isLocalFile;
+    const API_BASE = window.location.origin;
+
+    const DEFAULT_PROFILES = [
+      { id: 1, name: "Asha Raman", email: "asha@example.com", age: 24 },
+      { id: 2, name: "Karthik Selvam", email: "karthik@example.com", age: 28 },
+      { id: 3, name: "Priya Nair", email: "priya@example.com", age: 22 }
+    ];
+
+    function getLocalUsers() {
+      const stored = localStorage.getItem("profilevault_users");
+      if (!stored) {
+        localStorage.setItem("profilevault_users", JSON.stringify(DEFAULT_PROFILES));
+        return [...DEFAULT_PROFILES];
+      }
+      try { return JSON.parse(stored); } catch (e) { return [...DEFAULT_PROFILES]; }
+    }
+
+    function saveLocalUsers(list) {
+      localStorage.setItem("profilevault_users", JSON.stringify(list));
+    }
+
+    let allUsers = [];
+
+    // Theme Switcher Logic
+    const themeSelect = document.getElementById('themeSelect');
+    const savedTheme = localStorage.getItem('profilevault_theme') || 'aws-gold';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeSelect.value = savedTheme;
+
+    themeSelect.addEventListener('change', (e) => {
+      const selected = e.target.value;
+      document.documentElement.setAttribute('data-theme', selected);
+      localStorage.setItem('profilevault_theme', selected);
+      showToast(`Switched to ${selected.replace('-', ' ').toUpperCase()} theme`);
+    });
+
+    // Elements
+    const userTableBody = document.getElementById('userTableBody');
+    const searchInput = document.getElementById('searchInput');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    const exportJsonBtn = document.getElementById('exportJsonBtn');
+    const userModal = document.getElementById('userModal');
+    const userForm = document.getElementById('userForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const openAddModalBtn = document.getElementById('openAddModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const bulkModal = document.getElementById('bulkModal');
+    const openBulkModalBtn = document.getElementById('openBulkModalBtn');
+    const closeBulkBtn = document.getElementById('closeBulkBtn');
+    const submitBulkBtn = document.getElementById('submitBulkBtn');
+    const quickUserForm = document.getElementById('quickUserForm');
+    const statTotalUsers = document.getElementById('statTotalUsers');
+    const statAvgAge = document.getElementById('statAvgAge');
+    const statLatency = document.getElementById('statLatency');
+    const rawApiResponse = document.getElementById('rawApiResponse');
+
+    // Environment status text
+    const statusTextEl = document.querySelector(".status-badge span:last-child");
+    if (isGitHub) {
+      if (statusTextEl) statusTextEl.innerText = "Hosted on GitHub Pages";
+    } else if (isLocalFile) {
+      if (statusTextEl) statusTextEl.innerText = "Standalone Vault Active";
+    }
+
+    // Toast Alert
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `<span>${type === 'success' ? '✓' : '⚠'}</span> <span>${message}</span>`;
+      document.getElementById('toastContainer').appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).style.display = 'block';
+        if (btn.dataset.tab === 'raw-tab') loadRawMeta();
+      });
+    });
+
+    // Validation helper
+    function validateProfile(name, email, age) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      if (!name || name.trim().length < 2 || name.trim().length > 50) {
+        return "Name must be 2 to 50 characters";
+      }
+      if (!email || !emailRegex.test(email.trim())) {
+        return "Email must be a valid email address";
+      }
+      const numAge = Number(age);
+      if (!Number.isInteger(numAge) || numAge < 1 || numAge > 120) {
+        return "Age must be an integer between 1 and 120";
+      }
+      return null;
+    }
+
+    // Load users
+    async function loadUsers(query = '') {
+      const t0 = performance.now();
+      if (useLocalEngine) {
+        let users = getLocalUsers();
+        if (query) {
+          users = users.filter(u => u.name.toLowerCase().includes(query.toLowerCase()));
+        }
+        allUsers = users;
+        renderUsers(allUsers);
+        updateStats(allUsers);
+        statLatency.innerText = Math.round(performance.now() - t0) + ' ms';
+        return;
+      }
+
+      try {
+        const url = query ? `${API_BASE}/users?name=${encodeURIComponent(query)}` : `${API_BASE}/users`;
+        const res = await fetch(url);
+        const t1 = performance.now();
+        statLatency.innerText = Math.round(t1 - t0) + ' ms';
+
+        if (!res.ok) throw new Error('API returned ' + res.status);
+        allUsers = await res.json();
+        renderUsers(allUsers);
+        updateStats(allUsers);
+      } catch (err) {
+        // Fallback to local storage if API backend is not reachable
+        useLocalEngine = true;
+        if (statusTextEl) statusTextEl.innerText = "Standalone Vault Mode";
+        loadUsers(query);
+      }
+    }
+
+    function renderUsers(users) {
+      if (!users.length) {
+        userTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+              <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text);">No Profiles in Vault</div>
+              <p style="font-size: 0.85rem;">Use the quick manual entry bar above or click "New Profile" to add user data.</p>
+            </td>
+          </tr>`;
+        return;
+      }
+
+      userTableBody.innerHTML = users.map(u => {
+        const initials = u.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
+        return `
+          <tr>
+            <td><span class="badge-id">#${u.id}</span></td>
+            <td>
+              <div class="user-profile-cell">
+                <div class="user-avatar">${escapeHtml(initials)}</div>
+                <div class="user-name">${escapeHtml(u.name)}</div>
+              </div>
+            </td>
+            <td><span class="user-email">${escapeHtml(u.email)}</span></td>
+            <td><span class="badge-age">${u.age} yrs</span></td>
+            <td style="text-align: right;">
+              <div class="actions-cell" style="justify-content: flex-end;">
+                <button class="icon-btn" onclick="editUser(${u.id})">Edit</button>
+                <button class="icon-btn delete" onclick="deleteUser(${u.id})">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateStats(users) {
+      statTotalUsers.innerText = users.length;
+      if (users.length > 0) {
+        const avg = Math.round(users.reduce((acc, u) => acc + Number(u.age || 0), 0) / users.length);
+        statAvgAge.innerText = avg + ' yrs';
+      } else {
+        statAvgAge.innerText = '-';
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Quick Manual Entry Form
+    quickUserForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('quickName').value.trim();
+      const email = document.getElementById('quickEmail').value.trim();
+      const age = Number(document.getElementById('quickAge').value);
+
+      const valErr = validateProfile(name, email, age);
+      if (valErr) return showToast(valErr, 'error');
+
+      if (useLocalEngine) {
+        const current = getLocalUsers();
+        if (current.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+          return showToast("Email already exists in vault", 'error');
+        }
+        const nextId = current.length ? Math.max(...current.map(u => u.id)) + 1 : 1;
+        const newProfile = { id: nextId, name, email, age };
+        current.push(newProfile);
+        saveLocalUsers(current);
+        quickUserForm.reset();
+        showToast(`Profile for "${name}" stored in AWS ProfileVault!`);
+        loadUsers(searchInput.value.trim());
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, age })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          const errMsg = data.error || (data.errors && data.errors.join(', ')) || 'Failed to add profile';
+          throw new Error(errMsg);
+        }
+
+        quickUserForm.reset();
+        showToast(`Profile for "${data.name}" stored in AWS ProfileVault!`);
+        loadUsers(searchInput.value.trim());
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    // Clear All Profiles
+    clearAllBtn.addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to clear ALL profiles? This will give you a clean slate to enter manual data.')) return;
+      if (useLocalEngine) {
+        saveLocalUsers([]);
+        showToast('All profiles cleared from vault');
+        loadUsers();
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/users`, { method: 'DELETE' });
+        const data = await res.json();
+        showToast(data.message || 'All profiles cleared');
+        loadUsers();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    // Export JSON
+    exportJsonBtn.addEventListener('click', () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allUsers, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "aws_profilevault_users.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Exported profiles to JSON!');
+    });
+
+    // Modal controls
+    openAddModalBtn.addEventListener('click', () => {
+      modalTitle.innerText = 'Create New Profile';
+      userForm.reset();
+      document.getElementById('userId').value = '';
+      userModal.classList.add('open');
+    });
+
+    closeModalBtn.addEventListener('click', () => userModal.classList.remove('open'));
+    userModal.addEventListener('click', (e) => {
+      if (e.target === userModal) userModal.classList.remove('open');
+    });
+
+    // Bulk Modal
+    openBulkModalBtn.addEventListener('click', () => bulkModal.classList.add('open'));
+    closeBulkBtn.addEventListener('click', () => bulkModal.classList.remove('open'));
+    bulkModal.addEventListener('click', (e) => {
+      if (e.target === bulkModal) bulkModal.classList.remove('open');
+    });
+
+    submitBulkBtn.addEventListener('click', async () => {
+      const text = document.getElementById('bulkJson').value.trim();
+      if (!text) return showToast('Please enter a JSON array', 'error');
+
+      try {
+        const parsed = JSON.parse(text);
+        if (!Array.isArray(parsed)) throw new Error('Data must be an array of objects: [{ name, email, age }]');
+
+        if (useLocalEngine) {
+          const current = getLocalUsers();
+          let nextId = current.length ? Math.max(...current.map(u => u.id)) + 1 : 1;
+          let added = 0;
+          for (const item of parsed) {
+            if (!validateProfile(item.name, item.email, item.age)) {
+              if (!current.some(u => u.email.toLowerCase() === item.email.toLowerCase())) {
+                current.push({ id: nextId++, name: item.name.trim(), email: item.email.trim(), age: Number(item.age) });
+                added++;
+              }
+            }
+          }
+          saveLocalUsers(current);
+          bulkModal.classList.remove('open');
+          document.getElementById('bulkJson').value = '';
+          showToast(`Successfully imported ${added} profiles into vault!`);
+          loadUsers();
+          return;
+        }
+
+        const res = await fetch(`${API_BASE}/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(parsed)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Bulk insert failed');
+
+        bulkModal.classList.remove('open');
+        document.getElementById('bulkJson').value = '';
+        showToast(`Successfully imported ${result.total || parsed.length} profiles!`);
+        loadUsers();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    // Edit user
+    window.editUser = function(id) {
+      const u = allUsers.find(x => x.id === id);
+      if (!u) return;
+      modalTitle.innerText = `Edit Profile #${id}`;
+      document.getElementById('userId').value = u.id;
+      document.getElementById('userName').value = u.name;
+      document.getElementById('userEmail').value = u.email;
+      document.getElementById('userAge').value = u.age;
+      userModal.classList.add('open');
+    };
+
+    // Delete user
+    window.deleteUser = async function(id) {
+      if (!confirm(`Confirm removal of Profile #${id}?`)) return;
+      if (useLocalEngine) {
+        let current = getLocalUsers();
+        current = current.filter(u => u.id !== id);
+        saveLocalUsers(current);
+        showToast(`Profile #${id} removed from vault.`);
+        loadUsers(searchInput.value.trim());
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/users/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Delete failed');
+        showToast(`Profile #${id} deleted from vault.`);
+        loadUsers(searchInput.value.trim());
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    };
+
+    // Save user (POST or PUT)
+    userForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('userId').value;
+      const name = document.getElementById('userName').value.trim();
+      const email = document.getElementById('userEmail').value.trim();
+      const age = Number(document.getElementById('userAge').value);
+
+      const valErr = validateProfile(name, email, age);
+      if (valErr) return showToast(valErr, 'error');
+
+      const isEdit = Boolean(id);
+
+      if (useLocalEngine) {
+        const current = getLocalUsers();
+        const numId = Number(id);
+        if (current.some(u => u.email.toLowerCase() === email.toLowerCase() && (!isEdit || u.id !== numId))) {
+          return showToast("Email already exists in vault", 'error');
+        }
+
+        if (isEdit) {
+          const idx = current.findIndex(u => u.id === numId);
+          if (idx !== -1) {
+            current[idx] = { id: numId, name, email, age };
+            saveLocalUsers(current);
+            userModal.classList.remove('open');
+            showToast(`Profile #${id} updated in vault!`);
+            loadUsers(searchInput.value.trim());
+          }
+        } else {
+          const nextId = current.length ? Math.max(...current.map(u => u.id)) + 1 : 1;
+          current.push({ id: nextId, name, email, age });
+          saveLocalUsers(current);
+          userModal.classList.remove('open');
+          showToast(`Profile created successfully in vault!`);
+          loadUsers(searchInput.value.trim());
+        }
+        return;
+      }
+
+      const url = isEdit ? `${API_BASE}/users/${id}` : `${API_BASE}/users`;
+      const method = isEdit ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, age })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          const errMsg = data.error || (data.errors && data.errors.join(', ')) || 'Failed to save';
+          throw new Error(errMsg);
+        }
+
+        userModal.classList.remove('open');
+        showToast(isEdit ? `Profile #${id} updated!` : `Profile created successfully!`);
+        loadUsers(searchInput.value.trim());
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    // Search filter
+    let searchDebounce;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        loadUsers(e.target.value.trim());
+      }, 200);
+    });
+
+    refreshBtn.addEventListener('click', () => {
+      loadUsers(searchInput.value.trim());
+      showToast('Vault refreshed');
+    });
+
+    // Raw Metadata loader
+    async function loadRawMeta() {
+      if (useLocalEngine) {
+        rawApiResponse.innerText = JSON.stringify({
+          message: "AWS ProfileVault API - Standalone Cloud Mode",
+          status: "200 OK",
+          engine: isGitHub ? "Hosted on GitHub Pages" : "LocalStorage Engine",
+          endpoints: [
+            "GET /users",
+            "GET /users/:id",
+            "POST /users",
+            "PUT /users/:id",
+            "DELETE /users/:id"
+          ],
+          totalProfiles: getLocalUsers().length
+        }, null, 2);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api`, { headers: { 'Accept': 'application/json' } });
+        const data = await res.json();
+        rawApiResponse.innerText = JSON.stringify(data, null, 2);
+      } catch (e) {
+        rawApiResponse.innerText = 'Failed to load metadata';
+      }
+    }
+
+    // API Explorer
+    window.testEndpoint = async function(method, path, body = null) {
+      const statusPill = document.getElementById('responseStatus');
+      const viewer = document.getElementById('explorerResponse');
+      viewer.innerText = 'Executing request to ' + path + '...';
+
+      if (useLocalEngine) {
+        setTimeout(() => {
+          statusPill.style.display = 'inline-block';
+          if (path === '/users') {
+            statusPill.innerText = '200 OK';
+            statusPill.className = 'method-badge method-get';
+            viewer.innerText = JSON.stringify(getLocalUsers(), null, 2);
+          } else if (path.startsWith('/users/')) {
+            const id = Number(path.replace('/users/', ''));
+            const u = getLocalUsers().find(x => x.id === id);
+            if (u) {
+              statusPill.innerText = '200 OK';
+              statusPill.className = 'method-badge method-get';
+              viewer.innerText = JSON.stringify(u, null, 2);
+            } else {
+              statusPill.innerText = '404 Not Found';
+              statusPill.className = 'method-badge method-delete';
+              viewer.innerText = JSON.stringify({ error: `User with id ${id} not found` }, null, 2);
+            }
+          } else {
+            statusPill.innerText = '200 OK';
+            statusPill.className = 'method-badge method-get';
+            viewer.innerText = JSON.stringify({ message: "Request handled successfully", path, method }, null, 2);
+          }
+        }, 150);
+        return;
+      }
+
+      try {
+        const options = { method, headers: { 'Content-Type': 'application/json' } };
+        if (body) options.body = JSON.stringify(body);
+        const res = await fetch(API_BASE + path, options);
+        const data = await res.json();
+        statusPill.style.display = 'inline-block';
+        statusPill.innerText = `${res.status} ${res.statusText || 'OK'}`;
+        statusPill.className = `method-badge ${res.ok ? 'method-get' : 'method-delete'}`;
+        viewer.innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        statusPill.style.display = 'inline-block';
+        statusPill.innerText = 'Error';
+        statusPill.className = 'method-badge method-delete';
+        viewer.innerText = err.message;
+      }
+    };
+
+    // Initial load
+    loadUsers();
+  </script>
+</body>
+</html>

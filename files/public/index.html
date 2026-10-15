@@ -1051,7 +1051,30 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
+    const isGitHub = window.location.hostname.includes("github.io");
+    const isLocalFile = window.location.protocol === "file:";
+    let useLocalEngine = isGitHub || isLocalFile;
     const API_BASE = window.location.origin;
+
+    const DEFAULT_PROFILES = [
+      { id: 1, name: "Asha Raman", email: "asha@example.com", age: 24 },
+      { id: 2, name: "Karthik Selvam", email: "karthik@example.com", age: 28 },
+      { id: 3, name: "Priya Nair", email: "priya@example.com", age: 22 }
+    ];
+
+    function getLocalUsers() {
+      const stored = localStorage.getItem("profilevault_users");
+      if (!stored) {
+        localStorage.setItem("profilevault_users", JSON.stringify(DEFAULT_PROFILES));
+        return [...DEFAULT_PROFILES];
+      }
+      try { return JSON.parse(stored); } catch (e) { return [...DEFAULT_PROFILES]; }
+    }
+
+    function saveLocalUsers(list) {
+      localStorage.setItem("profilevault_users", JSON.stringify(list));
+    }
+
     let allUsers = [];
 
     // Theme Switcher Logic
@@ -1088,6 +1111,14 @@
     const statLatency = document.getElementById('statLatency');
     const rawApiResponse = document.getElementById('rawApiResponse');
 
+    // Environment status text
+    const statusTextEl = document.querySelector(".status-badge span:last-child");
+    if (isGitHub) {
+      if (statusTextEl) statusTextEl.innerText = "Hosted on GitHub Pages";
+    } else if (isLocalFile) {
+      if (statusTextEl) statusTextEl.innerText = "Standalone Vault Active";
+    }
+
     // Toast Alert
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
@@ -1108,21 +1139,52 @@
       });
     });
 
-    // Load users from API
+    // Validation helper
+    function validateProfile(name, email, age) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      if (!name || name.trim().length < 2 || name.trim().length > 50) {
+        return "Name must be 2 to 50 characters";
+      }
+      if (!email || !emailRegex.test(email.trim())) {
+        return "Email must be a valid email address";
+      }
+      const numAge = Number(age);
+      if (!Number.isInteger(numAge) || numAge < 1 || numAge > 120) {
+        return "Age must be an integer between 1 and 120";
+      }
+      return null;
+    }
+
+    // Load users
     async function loadUsers(query = '') {
       const t0 = performance.now();
+      if (useLocalEngine) {
+        let users = getLocalUsers();
+        if (query) {
+          users = users.filter(u => u.name.toLowerCase().includes(query.toLowerCase()));
+        }
+        allUsers = users;
+        renderUsers(allUsers);
+        updateStats(allUsers);
+        statLatency.innerText = Math.round(performance.now() - t0) + ' ms';
+        return;
+      }
+
       try {
         const url = query ? `${API_BASE}/users?name=${encodeURIComponent(query)}` : `${API_BASE}/users`;
         const res = await fetch(url);
         const t1 = performance.now();
         statLatency.innerText = Math.round(t1 - t0) + ' ms';
 
-        if (!res.ok) throw new Error('Failed to retrieve profiles');
+        if (!res.ok) throw new Error('API returned ' + res.status);
         allUsers = await res.json();
         renderUsers(allUsers);
         updateStats(allUsers);
       } catch (err) {
-        userTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#f87171; padding: 2.5rem;">Failed to connect to API: ${err.message}</td></tr>`;
+        // Fallback to local storage if API backend is not reachable
+        useLocalEngine = true;
+        if (statusTextEl) statusTextEl.innerText = "Standalone Vault Mode";
+        loadUsers(query);
       }
     }
 
@@ -1179,17 +1241,33 @@
     // Quick Manual Entry Form
     quickUserForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const payload = {
-        name: document.getElementById('quickName').value.trim(),
-        email: document.getElementById('quickEmail').value.trim(),
-        age: Number(document.getElementById('quickAge').value)
-      };
+      const name = document.getElementById('quickName').value.trim();
+      const email = document.getElementById('quickEmail').value.trim();
+      const age = Number(document.getElementById('quickAge').value);
+
+      const valErr = validateProfile(name, email, age);
+      if (valErr) return showToast(valErr, 'error');
+
+      if (useLocalEngine) {
+        const current = getLocalUsers();
+        if (current.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+          return showToast("Email already exists in vault", 'error');
+        }
+        const nextId = current.length ? Math.max(...current.map(u => u.id)) + 1 : 1;
+        const newProfile = { id: nextId, name, email, age };
+        current.push(newProfile);
+        saveLocalUsers(current);
+        quickUserForm.reset();
+        showToast(`Profile for "${name}" stored in AWS ProfileVault!`);
+        loadUsers(searchInput.value.trim());
+        return;
+      }
 
       try {
         const res = await fetch(`${API_BASE}/users`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ name, email, age })
         });
         const data = await res.json();
         if (!res.ok) {
@@ -1208,6 +1286,13 @@
     // Clear All Profiles
     clearAllBtn.addEventListener('click', async () => {
       if (!confirm('Are you sure you want to clear ALL profiles? This will give you a clean slate to enter manual data.')) return;
+      if (useLocalEngine) {
+        saveLocalUsers([]);
+        showToast('All profiles cleared from vault');
+        loadUsers();
+        return;
+      }
+
       try {
         const res = await fetch(`${API_BASE}/users`, { method: 'DELETE' });
         const data = await res.json();
@@ -1258,6 +1343,26 @@
         const parsed = JSON.parse(text);
         if (!Array.isArray(parsed)) throw new Error('Data must be an array of objects: [{ name, email, age }]');
 
+        if (useLocalEngine) {
+          const current = getLocalUsers();
+          let nextId = current.length ? Math.max(...current.map(u => u.id)) + 1 : 1;
+          let added = 0;
+          for (const item of parsed) {
+            if (!validateProfile(item.name, item.email, item.age)) {
+              if (!current.some(u => u.email.toLowerCase() === item.email.toLowerCase())) {
+                current.push({ id: nextId++, name: item.name.trim(), email: item.email.trim(), age: Number(item.age) });
+                added++;
+              }
+            }
+          }
+          saveLocalUsers(current);
+          bulkModal.classList.remove('open');
+          document.getElementById('bulkJson').value = '';
+          showToast(`Successfully imported ${added} profiles into vault!`);
+          loadUsers();
+          return;
+        }
+
         const res = await fetch(`${API_BASE}/users`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1290,6 +1395,15 @@
     // Delete user
     window.deleteUser = async function(id) {
       if (!confirm(`Confirm removal of Profile #${id}?`)) return;
+      if (useLocalEngine) {
+        let current = getLocalUsers();
+        current = current.filter(u => u.id !== id);
+        saveLocalUsers(current);
+        showToast(`Profile #${id} removed from vault.`);
+        loadUsers(searchInput.value.trim());
+        return;
+      }
+
       try {
         const res = await fetch(`${API_BASE}/users/${id}`, { method: 'DELETE' });
         const data = await res.json();
@@ -1305,13 +1419,42 @@
     userForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('userId').value;
-      const payload = {
-        name: document.getElementById('userName').value.trim(),
-        email: document.getElementById('userEmail').value.trim(),
-        age: Number(document.getElementById('userAge').value)
-      };
+      const name = document.getElementById('userName').value.trim();
+      const email = document.getElementById('userEmail').value.trim();
+      const age = Number(document.getElementById('userAge').value);
+
+      const valErr = validateProfile(name, email, age);
+      if (valErr) return showToast(valErr, 'error');
 
       const isEdit = Boolean(id);
+
+      if (useLocalEngine) {
+        const current = getLocalUsers();
+        const numId = Number(id);
+        if (current.some(u => u.email.toLowerCase() === email.toLowerCase() && (!isEdit || u.id !== numId))) {
+          return showToast("Email already exists in vault", 'error');
+        }
+
+        if (isEdit) {
+          const idx = current.findIndex(u => u.id === numId);
+          if (idx !== -1) {
+            current[idx] = { id: numId, name, email, age };
+            saveLocalUsers(current);
+            userModal.classList.remove('open');
+            showToast(`Profile #${id} updated in vault!`);
+            loadUsers(searchInput.value.trim());
+          }
+        } else {
+          const nextId = current.length ? Math.max(...current.map(u => u.id)) + 1 : 1;
+          current.push({ id: nextId, name, email, age });
+          saveLocalUsers(current);
+          userModal.classList.remove('open');
+          showToast(`Profile created successfully in vault!`);
+          loadUsers(searchInput.value.trim());
+        }
+        return;
+      }
+
       const url = isEdit ? `${API_BASE}/users/${id}` : `${API_BASE}/users`;
       const method = isEdit ? 'PUT' : 'POST';
 
@@ -1319,7 +1462,7 @@
         const res = await fetch(url, {
           method,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ name, email, age })
         });
         const data = await res.json();
 
@@ -1352,6 +1495,23 @@
 
     // Raw Metadata loader
     async function loadRawMeta() {
+      if (useLocalEngine) {
+        rawApiResponse.innerText = JSON.stringify({
+          message: "AWS ProfileVault API - Standalone Cloud Mode",
+          status: "200 OK",
+          engine: isGitHub ? "Hosted on GitHub Pages" : "LocalStorage Engine",
+          endpoints: [
+            "GET /users",
+            "GET /users/:id",
+            "POST /users",
+            "PUT /users/:id",
+            "DELETE /users/:id"
+          ],
+          totalProfiles: getLocalUsers().length
+        }, null, 2);
+        return;
+      }
+
       try {
         const res = await fetch(`${API_BASE}/api`, { headers: { 'Accept': 'application/json' } });
         const data = await res.json();
@@ -1366,6 +1526,35 @@
       const statusPill = document.getElementById('responseStatus');
       const viewer = document.getElementById('explorerResponse');
       viewer.innerText = 'Executing request to ' + path + '...';
+
+      if (useLocalEngine) {
+        setTimeout(() => {
+          statusPill.style.display = 'inline-block';
+          if (path === '/users') {
+            statusPill.innerText = '200 OK';
+            statusPill.className = 'method-badge method-get';
+            viewer.innerText = JSON.stringify(getLocalUsers(), null, 2);
+          } else if (path.startsWith('/users/')) {
+            const id = Number(path.replace('/users/', ''));
+            const u = getLocalUsers().find(x => x.id === id);
+            if (u) {
+              statusPill.innerText = '200 OK';
+              statusPill.className = 'method-badge method-get';
+              viewer.innerText = JSON.stringify(u, null, 2);
+            } else {
+              statusPill.innerText = '404 Not Found';
+              statusPill.className = 'method-badge method-delete';
+              viewer.innerText = JSON.stringify({ error: `User with id ${id} not found` }, null, 2);
+            }
+          } else {
+            statusPill.innerText = '200 OK';
+            statusPill.className = 'method-badge method-get';
+            viewer.innerText = JSON.stringify({ message: "Request handled successfully", path, method }, null, 2);
+          }
+        }, 150);
+        return;
+      }
+
       try {
         const options = { method, headers: { 'Content-Type': 'application/json' } };
         if (body) options.body = JSON.stringify(body);

@@ -4,7 +4,10 @@ SaiKet Systems Full Stack Development Internship - Task 4: High-Performance REST
 
 Data is stored in-memory with manual entry, bulk JSON import, validation, and multi-theme dashboard support.
 
+[![Hosted on GitHub Pages](https://img.shields.io/badge/Hosted%20on-GitHub%20Pages-22c55e?style=for-the-badge&logo=github)](https://irfan1123202.github.io/apikey-creator/)
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/irfan1123202/apikey-creator)
+
+🌐 **Live Website on GitHub Pages**: [https://irfan1123202.github.io/apikey-creator/](https://irfan1123202.github.io/apikey-creator/)
 
 ## Run Locally
 ```bash
